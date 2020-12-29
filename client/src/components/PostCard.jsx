@@ -1,48 +1,46 @@
-import React from 'react';
-import { Card, Image, Button, Label, Icon } from 'semantic-ui-react';
+import React, {useContext} from 'react';
+import { Card, Image, Button, Label, Icon, Popup } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 
-export default function PostCard(props) {
-    const { body, createdAt, id, username, likeCount, commentCount } = props.post;
-    
-    function likePost() {
-        console.log('post liked!!!');
-    }
+import { AuthContext } from '../context/auth';
+import LikeButton from './LikeButton';
+import DeleteButton from './DeleteButton';
 
-    function commentOnPost() {
-        console.log('Commented!!!');
-    }
+export default function PostCard(props) {
+    const { user } = useContext(AuthContext);
+
+    const { body, createdAt, id, username, likeCount, commentCount, likes } = props.post;
 
     return (
         <Card fluid>
-            <Card.Content>
+            <Card.Content as={Link} to={`/posts/${id}`}>
                 <Image
                 floated='right'
                 size='mini'
                 src='https://react.semantic-ui.com/images/avatar/large/molly.png'
                 />
                 <Card.Header>{username}</Card.Header>
-                <Card.Meta as={Link} to={`/posts/${id}`}>{moment(createdAt).fromNow()}</Card.Meta>
+                <Card.Meta>{moment(createdAt).fromNow()}</Card.Meta>
                 <Card.Description>{body}</Card.Description>
             </Card.Content>
             <Card.Content extra>
-                <Button as='div' labelPosition='right'>
-                    <Button color='teal' basic onClick={likePost}>
-                        <Icon name='heart' />
-                    </Button>
-                    <Label basic color='teal' pointing='left'>
-                        {likeCount}
-                    </Label>
-                </Button>
-                <Button as='div' labelPosition='right'>
-                    <Button color='blue' basic onClick={commentOnPost}>
-                        <Icon name='comment' />
-                    </Button>
-                    <Label basic color='blue' pointing='left'>
-                        {commentCount}
-                    </Label>
-                </Button>
+                <LikeButton user={user} post={{ id, likes, likeCount }}  />
+                <Popup 
+                    content="Comment on post"
+                    inverted
+                    trigger={
+                        <Button labelPosition='right' as={Link} to={`/Posts/${id}`}>
+                            <Button color='blue' basic>
+                                <Icon name='comment' />
+                            </Button>
+                            <Label basic color='blue' pointing='left'>
+                                {commentCount}
+                            </Label>
+                        </Button>
+                    }
+                />
+                {user && user.username === username && <DeleteButton postId={id} />}
             </Card.Content>
         </Card>
     )

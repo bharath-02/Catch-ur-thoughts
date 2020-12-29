@@ -6,6 +6,8 @@ const typeDefs = require('./graphql/typedefs');
 const resolvers = require('./graphql/resolvers/index');
 const { DB_URL } = require('./config.js');
 
+const PORT = process.env.PORT || 5000;
+
 const server = new ApolloServer({
     typeDefs,
     resolvers,
@@ -15,7 +17,7 @@ const server = new ApolloServer({
 mongoose.connect(DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Database connected'.yellow.bold);
-        return server.listen({ port: 5000 });
+        return server.listen({ port: PORT });
     })
     .then((res) => {
         console.log(`Server running at ${res.url}`.cyan.bold);
